@@ -27,9 +27,9 @@ podTemplate(yaml: '''
 			stage("Test Result") {
 			  echo 'Generating test results'
 			  publishHTML(target: [
-              reportDir: 'build/reports/tests/acceptanceTest',
+              reportDir: 'Chapter09/sample3/build/reports/tests/acceptanceTest',
               reportFiles: 'index.html',
-              reportName: "Acceptance Test Result"
+              reportName: "AcceptanceTestResult"
               ])
             }
         }	
