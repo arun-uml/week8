@@ -25,8 +25,10 @@ podTemplate(yaml: '''
 			}
 			stage("Test calculator") {
 			  sh '''
-			  curl calculator-service:8080/sum?a=1\\&b=2
-			  curl calculator-service:8080/div?a=6\\&b=3
+			  test $(curl calculator-service:8080/sum?a=2\\&b=3) -eq 5 && echo 'Pass' || 'Fail'
+			  test $(curl calculator-service:8080/div?a=6\\&b=3) -eq 2 && echo 'Pass' || 'Fail'
+			  curl calculator-service:8080/div?a=5\\&b=0
+			  test $(curl calculator-service:8080/div?a=5\\&b=0) -eq 2 && echo 'Pass' || 'Fail'
 			  '''
           }
 		}
