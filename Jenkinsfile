@@ -16,16 +16,12 @@ podTemplate(yaml: '''
     stage('gradle') {
 		git 'https://github.com/arun-uml/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
 		container('gradle') {			
-			stage('Build gradle') {
+			stage('Acceptance Test') {
 			  sh '''
 			  pwd
 			  cd Chapter09/sample3
-			  chmod +x gradlew			  
-			  '''
-			}
-			stage("Acceptance Test") {
-			  sh '''
-			  gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080
+			  chmod +x gradlew
+              gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080			  
 			  '''
 			}
 			stage("Test Result") {
