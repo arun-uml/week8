@@ -3,8 +3,8 @@ podTemplate(yaml: '''
     kind: Pod
     spec:
       containers:
-      - name: centos
-        image: centos
+      - name: gradle
+        image: gradle:jdk8
         command:
         - sleep
         args:
@@ -13,26 +13,30 @@ podTemplate(yaml: '''
 ''') 
 {
   node(POD_LABEL) {
-    stage('calculator') {
+    stage('gradle') {
 		git 'https://github.com/arun-uml/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
-		container('centos') {			
-			stage('Start calculator') {
+		container('gradle') {			
+			stage('Build gradle') {
 			  sh '''
 			  pwd
-			  cd Chapter08/sample1
-			  pwd
-			  curl -ik -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/devops-tools/deployments -XPOST -H "Content-type: application/yaml" --data-binary @hazelcast.yaml
-			  curl -ik -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/devops-tools/deployments -XPOST -H "Content-type: application/yaml" --data-binary @calculator.yaml
+			  cd Chapter09/sample3
+			  chmod +x gradlew			  
 			  '''
 			}
-			stage("Test calculator") {
+			stage("Acceptance Test") {
 			  sh '''
-			  test $(curl calculator-service:8080/sum?a=2\\&b=3) -eq 5 && echo 'Pass' || 'Fail'
-			  test $(curl calculator-service:8080/div?a=6\\&b=3) -eq 2 && echo 'Pass' || 'Fail'
-			  test "$(curl calculator-service:8080/div?a=5\\&b=0)" = "Division by 0" && echo 'Fail:Division by 0' || 'Fail'
+			  ./gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080
 			  '''
-          }
-		}
+			}
+			stage("Test Result") {
+			  echo 'Generating test results'
+			  publishHTML(target: [
+              reportDir: 'build/reports/tests/acceptanceTest',
+              reportFiles: 'index.html',
+              reportName: "Acceptance Test Result"
+              ])
+            }
+        }	
 	}
   }
 }
