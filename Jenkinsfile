@@ -27,8 +27,7 @@ podTemplate(yaml: '''
 			  sh '''
 			  test $(curl calculator-service:8080/sum?a=2\\&b=3) -eq 5 && echo 'Pass' || 'Fail'
 			  test $(curl calculator-service:8080/div?a=6\\&b=3) -eq 2 && echo 'Pass' || 'Fail'
-			  curl calculator-service:8080/div?a=5\\&b=0
-			  test $(curl calculator-service:8080/div?a=5\\&b=0) -eq 2 && echo 'Pass' || 'Fail'
+			  test $(curl calculator-service:8080/div?a=5\\&b=0) = 'Division by 0' && echo 'Fail:Division by 0' || 'Fail'
 			  '''
           }
 		}
